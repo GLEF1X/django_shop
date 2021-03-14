@@ -309,4 +309,3 @@ class Basket(TimeBasedModel):
     def __str__(self):
         """String representation of basket object"""
         return """{} added to basket {}""".format(self.user, self.product)
-

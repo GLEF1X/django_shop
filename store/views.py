@@ -1,14 +1,18 @@
 from datetime import date
-from typing import Dict, Any, List, Union, Optional
+from typing import Dict, Any, List, Union
 
 from django import http
 from django.core.mail import send_mail
 from django.db.models import Prefetch, Sum, F, DecimalField, QuerySet
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, FileResponse, HttpResponseRedirect
+from django.forms import model_to_dict
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, FileResponse, HttpResponseRedirect, \
+    JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.template.response import SimpleTemplateResponse
 from django.urls import reverse_lazy, reverse, resolve
+from django.utils.decorators import method_decorator
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from django.views.defaults import page_not_found
 
 from store.forms import MailingForm, UserForm, QuantityForm
@@ -342,3 +346,21 @@ class UpdateBasket(generic.View):
             )
         else:
             print("UPDATING")
+
+
+class ApiView(generic.View):
+
+    def post(self, request: HttpRequest) -> Union[JsonResponse, HttpResponseNotAllowed]:
+        from djangoProject.settings import SECRET_KEY, SECRET_CODE
+        if request.POST['SECRET_KEY'] == SECRET_KEY:
+            if request.POST['SECRET_CODE'] == SECRET_CODE:
+                return JsonResponse(
+                    data=model_to_dict(Review.objects.filter(pk=1).first()), safe=False
+                )
+        return HttpResponseNotAllowed(
+            permitted_methods='GET'
+        )
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ApiView, self).dispatch(request, *args, **kwargs)

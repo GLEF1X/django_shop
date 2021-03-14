@@ -1,58 +1,69 @@
-version: "3.1"
-
-services:
-  db:
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: django_db
-      POSTGRES_USER: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - ./docker_data/pg_data:/var/lib/postgresql/data/pgdata
-
-    ports:
-      - "5433:5432"
-    container_name: database
-    restart: always
-    networks:
-      - db
-  django_app:
-    image: django_app:0.0.1
-    container_name: app
-    ports:
-      - "80:80"
-    command: python3 manage.py runserver 0.0.0.0:80 --noreload
-    restart: on-failure
-    networks:
-      - db
-      - django
-    depends_on:
-      - db
-      - migrations
-  maker_migration:
-    image: django_app:0.0.1
-    command: python3 manage.py makemigrations
-    container_name: maker_migration
-    networks:
-      - db
-      - django
-    depends_on:
-      - db
-  migrations:
-    image: django_app:0.0.1
-    container_name: migrations
-    command: python3 manage.py migrate
-    networks:
-      - db
-      - django
-    depends_on:
-      - db
-      - maker_migration
-
-
 networks:
   db:
     driver: bridge
   django:
     driver: bridge
+services:
+  db:
+    container_name: database
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: django_db
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    image: postgres
+    networks:
+      - db
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+    - /home/glef1x/PycharmProjects/django_project/docker_data/pg_data:/var/lib/postgresql/data/pgdata:rw
+  django_app:
+    command: python3 manage.py runserver 0.0.0.0:80 --noreload
+    container_name: app
+    depends_on:
+    - db
+    - migrations
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+    image: django_app:0.0.1
+    networks:
+      - db
+      - django
+    ports:
+      - "80:80"
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: /home/glef1x/PycharmProjects/django_project
+        target: /usr/src/app
+  maker_migration:
+    command: python3 manage.py makemigrations
+    container_name: maker_migration
+    depends_on:
+    - db
+    image: django_app:0.0.1
+    networks:
+      - db
+      - django
+  migrations:
+    command: python3 manage.py migrate
+    container_name: migrations
+    depends_on:
+    - db
+    - maker_migration
+    image: django_app:0.0.1
+    networks:
+      - db
+      - django
+version: '3.7'
+volumes:
+  static_data:
+  production_data:
