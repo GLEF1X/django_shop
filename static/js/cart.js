@@ -172,7 +172,7 @@ $(document).ready(function () {
                 if (sum_priceEl) {
                     for (let count = 0; count < priceEl.length; count = count + 2) {
                         endPriceVAl = parseFloat(priceEl[count].innerText.replace('$', '')) + parseFloat(delta_value.replace('$', ''))
-                        priceEl[count].innerText = ('$'.concat(endPriceVAl.toString())).concat(',00')
+                        priceEl[count].innerText = ('$'.concat(endPriceVAl.toString()))
                         sum_priceEl.innerText = ('$'.concat(endPriceVAl.toString()))
                     }
                     sum_priceEl.innerText = '$'.concat((parseFloat(delta_value.replace('$', '')) * endVal).toString())
@@ -186,7 +186,7 @@ $(document).ready(function () {
                 if (sum_priceEl) {
                     for (let count = 0; count < priceEl.length; count = count + 2) {
                         endPriceVAl = parseFloat(priceEl[count].innerText.replace('$', '')) - parseFloat(delta_value.replace('$', ''))
-                        priceEl[count].innerText = ('$'.concat(endPriceVAl.toString())).concat(',00')
+                        priceEl[count].innerText = ('$'.concat(endPriceVAl.toString()))
                         sum_priceEl.innerText = ('$'.concat(endPriceVAl.toString()))
                     }
                 }

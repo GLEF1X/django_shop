@@ -144,7 +144,7 @@ class OrderDetails(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, db_index=True)
 
     class Meta:
-        db_table = 'news_order_details'
+        db_table = 'store_order_details'
 
     unit_price = models.DecimalField(
         max_digits=8,

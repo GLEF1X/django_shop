@@ -1,3 +1,4 @@
+# Venv, another directories, sqlite3 file and __pycache__
 *.sqlite3
 docker_data/
 .mypy_cache/
@@ -9,3 +10,4 @@ venv
 *.jpeg
 *.png
 *.jpg
+.env
