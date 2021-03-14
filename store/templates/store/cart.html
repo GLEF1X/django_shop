@@ -1,0 +1,61 @@
+{% extends 'store/extends/base_cart.html' %}
+{% load static %}
+<html lang="en">
+<body>
+<!-- Cart Info -->
+{% block cart_info %}
+    <div class="row">
+        <div class="col">
+            <!-- Column Titles -->
+            <div class="cart_info_columns clearfix">
+                <div class="cart_info_col cart_info_col_product">Продукт</div>
+                <div class="cart_info_col cart_info_col_price">Цена</div>
+                <div class="cart_info_col cart_info_col_quantity">Количество</div>
+                <div class="cart_info_col cart_info_col_total">Всего</div>
+            </div>
+        </div>
+    </div>
+    <div class="row cart_items_row">
+        <div class="col">
+
+            <!-- Cart Item -->
+            {% for item in basket %}
+            <div class="cart_item d-flex flex-lg-row flex-column align-items-lg-center align-items-start justify-content-start">
+                    <!-- Name -->
+                    <div class="cart_item_product d-flex flex-row align-items-center justify-content-start">
+                        <div class="cart_item_image">
+                            <div><img src="{{ item.products.photo.url }}" alt=""></div>
+                        </div>
+                        <div class="cart_item_name_container">
+                            <div class="cart_item_name"><a
+                                    href="{{ item.products.get_absolute_url }}">{{ item.products.product_name }}</a>
+                            </div>
+                            <div class="cart_item_edit"><a href="#">Edit Product</a></div>
+                        </div>
+                    </div>
+                    <!-- Price -->
+                    <div class="cart_item_price">${{ item.products.unit_price }}</div>
+                    <!-- Quantity -->
+                    <div class="cart_item_quantity">
+                        <div class="product_quantity_container">
+                            <div class="product_quantity clearfix">
+                                <span>Кол-во</span>
+                                <input id="quantity_input" type="text" pattern="[0-9]*" value="{{ item.quantity }}">
+                                <div class="quantity_buttons">
+                                    <div id="quantity_inc_button" class="quantity_inc quantity_control"><i
+                                            class="fa fa-chevron-up" aria-hidden="true"></i></div>
+                                    <div id="quantity_dec_button" class="quantity_dec quantity_control"><i
+                                            class="fa fa-chevron-down" aria-hidden="true"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total -->
+                    <div class="cart_item_total">${% widthratio item.quantity 1 item.products.unit_price%}</div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+</body>
+</html>

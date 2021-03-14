@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+<html lang="en">
+<body>
+{% block content %}
+    <div class="super_container">
+
+        <!-- Header -->
+        <!-- Search Panel -->
+        <!-- Social -->
+
+        <!-- Menu -->
+
+
+        <!-- Home -->
+        {% include 'store/include/slider.html' %}
+        <!-- Ads -->
+        {% include 'store/include/ads.html' %}
+
+        <!-- Products -->
+
+        <div class="products">
+            {% block products %}
+            {% endblock %}
+        </div>
+
+        {% block adds %}
+            {% include 'store/include/add.html' %}
+        {% endblock %}
+        {% block icon_boxes %}
+            {% include 'store/include/icon_boxes.html' %}
+        {% endblock %}
+        {% block newsletter %}
+            {% include "store/include/newsletter.html" %}
+        {% endblock %}
+    </div>
+{% endblock %}
+</body>
+
+</html>

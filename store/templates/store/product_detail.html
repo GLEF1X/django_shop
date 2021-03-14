@@ -1,0 +1,148 @@
+{% extends 'store/extends/base_product_detail.html' %}
+{% block product_detail %}
+    <div class="container">
+        <div class="row details_row">
+
+            <!-- Product Image -->
+            <div class="col-lg-6">
+                <div class="details_image">
+                    <div class="details_image_large"><img src="{{ product.photo.url }}" alt="">
+                        <div class="product_extra product_new"><a href="category_detail.html">New</a></div>
+                    </div>
+                    <div class="details_image_thumbnails d-flex flex-row align-items-start justify-content-between">
+                        <div class="details_image_thumbnail active" data-image="{{ product.photo.url }}"><img
+                                src="{{ product.photo.url }}" alt=""></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Content -->
+            <div class="col-lg-6">
+                <div class="details_content">
+                    <div class="details_name">{{ product.product_name }}</div>
+                    <div class="details_discount">${{ product.unit_price|add:200 }}</div>
+                    <div class="details_price">${{ product.unit_price }}</div>
+
+                    <!-- In Stock -->
+
+                    <div class="in_stock_container">
+                        <div class="availability">Availability:</div>
+                        <span>{% if not product.discontinued %}In Stock{% endif %}</span>
+                    </div>
+                    <div class="details_text">
+                        {% autoescape off %}
+                            <p>{{ product.description }}</p>
+                        {% endautoescape %}
+                    </div>
+                    <form action="{% url 'store:add_to_basket' %}" method="post" id="add_to_cart">{% csrf_token %}
+                        <!-- Product Quantity -->
+                        <input type="hidden" value="{{ product.pk }}" name="product_id">
+                        <div class="product_quantity_container">
+                            <div class="product_quantity clearfix">
+                                <span>Кол-во</span>
+                                {% for field in quantity_input %}
+                                    {{ field }}
+                                {% endfor %}
+                                <div class="quantity_buttons">
+                                    <div id="quantity_inc_button" class="quantity_inc quantity_control"><i
+                                            class="fa fa-chevron-up" aria-hidden="true"></i></div>
+                                    <div id="quantity_dec_button" class="quantity_dec quantity_control"><i
+                                            class="fa fa-chevron-down" aria-hidden="true"></i></div>
+                                </div>
+                            </div>
+                            <div class="button cart_button"><a onclick="document.forms['add_to_cart'].submit();">Add to
+                                cart</a></div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Share -->
+                <div class="details_share">
+                    <span>Share:</span>
+                    <ul>
+                        <li><a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row description_row">
+        <div class="col">
+            <div class="description_title_container">
+                <div class="description_title">Description</div>
+                {% with count=reviews.comments.count %}
+                    <div class="reviews_title"><a href="#">Reviews <span>({{ count }})</span></a></div>
+                {% endwith %}
+            </div>
+            <div class="description_text">
+                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+                    invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. Phasellus id nisi quis
+                    justo tempus mollis sed et dui. In hac habitasse platea dictumst. Suspendisse ultrices
+                    mauris diam. Nullam sed aliquet elit. Mauris consequat nisi ut mauris efficitur lacinia.</p>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+<!-- Products -->
+
+<div class="products">
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <div class="products_title">Related Products</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+
+                <div class="product_grid">
+
+                    <!-- Product -->
+                    <div class="product">
+                        <div class="product_image"><img src="images/product_1.jpg" alt=""></div>
+                        <div class="product_extra product_new"><a href="category_detail.html">New</a></div>
+                        <div class="product_content">
+                            <div class="product_title"><a href="product_detail.html">Smart Phone</a></div>
+                            <div class="product_price">$670</div>
+                        </div>
+                    </div>
+
+                    <!-- Product -->
+                    <div class="product">
+                        <div class="product_image"><img src="images/product_2.jpg" alt=""></div>
+                        <div class="product_extra product_sale"><a href="category_detail.html">Sale</a></div>
+                        <div class="product_content">
+                            <div class="product_title"><a href="product_detail.html">Smart Phone</a></div>
+                            <div class="product_price">$520</div>
+                        </div>
+                    </div>
+
+                    <!-- Product -->
+                    <div class="product">
+                        <div class="product_image"><img src="images/product_3.jpg" alt=""></div>
+                        <div class="product_content">
+                            <div class="product_title"><a href="product_detail.html">Smart Phone</a></div>
+                            <div class="product_price">$710</div>
+                        </div>
+                    </div>
+
+                    <!-- Product -->
+                    <div class="product">
+                        <div class="product_image"><img src="images/product_4.jpg" alt=""></div>
+                        <div class="product_content">
+                            <div class="product_title"><a href="product_detail.html">Smart Phone</a></div>
+                            <div class="product_price">$330</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

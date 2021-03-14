@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="{% url 'store:validator' %}" method="post">
+    {% csrf_token %}
+    {% comment %}
+        <label for="{{ form.first_name.id_for_label }}">
+        {{ form.first_name.label_tag }}
+    </label>
+    {{ form.first_name}}
+    {{ form.last_name }}
+    {{ form.email }}
+    {% endcomment %}
+    {{ form.as_p }}
+    <input type="submit" class="success">
+</form>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends 'store/extends/base_product_list.html' %}
+
+{% block categories %}
+    <li class="hassubs">
+        <a href="category_detail.html">Categories</a>
+        <ul>
+            {% for category in all_categories %}
+                <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endblock %}
+{% block products %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+
+                <div class="product_grid">
+
+                    <!-- Product -->
+                    {% for product in product_list %}
+                        <div class="product">
+                            <div class="product_image"><img src="{{ product.photo.url }}" alt=""></div>
+                            <div class="product_extra product_new"><a href="category_detail.html">New</a></div>
+                            <div class="product_content">
+                                <div class="product_title"><a
+                                        href="{{ product.get_absolute_url }}">{{ product.product_name }}</a>
+                                </div>
+                                <div class="product_price">${{ product.unit_price }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,58 @@
+version: "3.1"
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: django_db
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./docker_data/pg_data:/var/lib/postgresql/data/pgdata
+
+    ports:
+      - "5433:5432"
+    container_name: database
+    restart: always
+    networks:
+      - db
+  django_app:
+    image: django_app:0.0.1
+    container_name: app
+    ports:
+      - "80:80"
+    command: python3 manage.py runserver 0.0.0.0:80 --noreload
+    restart: on-failure
+    networks:
+      - db
+      - django
+    depends_on:
+      - db
+      - migrations
+  maker_migration:
+    image: django_app:0.0.1
+    command: python3 manage.py makemigrations
+    container_name: maker_migration
+    networks:
+      - db
+      - django
+    depends_on:
+      - db
+  migrations:
+    image: django_app:0.0.1
+    container_name: migrations
+    command: python3 manage.py migrate
+    networks:
+      - db
+      - django
+    depends_on:
+      - db
+      - maker_migration
+
+
+networks:
+  db:
+    driver: bridge
+  django:
+    driver: bridge

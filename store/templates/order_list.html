@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+</head>
+<body>
+<ul>
+    {% for order in order_list %}
+        <li>
+        {% for user in order.users %}
+            <h2>
+            Пользователь {{ user.first_name }} {{ user.last_name }} сделал заказ #{{ order.unique_abbreviation }} на сумму {{ order.order_price }} UAH
+            размер продукта: {{ order.products.get_size_display }}
+            </h2>
+            </li>
+        {% endfor %}
+    {% endfor %}
+    <h1>
+        Максимальная цена продукта: {{ max_order_price }} UAH
+    </h1>
+    <a href="{% url 'store:store-today' %}">Тыкни сюда</a>
+</ul>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% load i18n %}
+<div class="sidebar-container">
+    <div class="sidebar-logo">
+        АДМИН-ПАНЕЛЬ
+    </div>
+    <ul class="sidebar-navigation">
+        {% if app_list %}
+            {% for app in app_list %}
+                <li class="header">{{ app.name }}</li>
+                {% for model in app.models %}
+                    <li>
+                        <a href="{{ model.admin_url }}">
+                            <i class="fa fa-home" aria-hidden="true"></i> {{ model.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endfor %}
+            </ul>
+
+        {% else %}
+            <p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
+        {% endif %}
+</div>
