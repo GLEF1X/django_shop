@@ -150,8 +150,11 @@ class ProductDetailView(FilledDetailView):
     context_object_name = 'product'
 
     def get_queryset(self) -> QuerySet[Product]:
-        return Product.objects.filter(discontinued=False).only(
-            'slug', 'unit_price', 'product_name', 'description', 'quantity', 'discontinued', 'photo', 'slug'
+        return Product.objects.filter(discontinued=False).prefetch_related(
+            Prefetch('category', queryset=Category.objects.only('name', 'description', 'id'), to_attr='s_category')
+        ).only(
+            'slug', 'unit_price', 'product_name', 'description', 'quantity', 'discontinued', 'photo', 'slug',
+            'category_id'
         )
 
     def get_context_data(self, **kwargs):
