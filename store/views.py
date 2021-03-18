@@ -364,3 +364,8 @@ class ApiView(generic.View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(ApiView, self).dispatch(request, *args, **kwargs)
+
+
+class BaseView2(generic.View):
+    def get(self, *args, **kwargs) -> HttpResponseRedirect:
+        pass

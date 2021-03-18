@@ -1,74 +1,63 @@
 import asyncio
-from dataclasses import dataclass
 from itertools import repeat
-from typing import Literal, Optional, Union, Dict, List, Tuple, Any, Type, Generator, Awaitable, AsyncGenerator
+from typing import Literal, Optional, Union, Dict, List, Tuple, Any, Type, AsyncGenerator
 
-from aiohttp import ClientTimeout, ClientSession, ContentTypeError, ClientRequest, ClientProxyConnectionError
+from aiohttp import ClientTimeout, ClientSession, ContentTypeError, ClientRequest, ClientProxyConnectionError, \
+    ServerDisconnectedError
 from aiohttp.client import DEFAULT_TIMEOUT
-from aiosocksy import Socks5Auth, SocksError
+from aiosocksy import SocksError
 from aiosocksy.connector import ProxyConnector, ProxyClientRequest
 
-ProxyError = Exception()
+from parser.data import CredentialService, RequestAuthError, Response
 
 
-@dataclass(frozen=True)
-class Response:
-    status_code: int
-    response_data: Optional[Union[dict, str, bytes, bytearray, Exception]] = None
-
-    @classmethod
-    def bad_response(cls) -> 'Response':
-        return cls(
-            status_code=500,
-            response_data=ProxyError
-        )
-
-
-@dataclass()
-class CredentialService:
-    login: str
-    password: str
-    ip_address: str
-    service_type: Literal['SOCKS5', 'SOCKS4'] = 'SOCKS5'
-    proxy_auth: Optional[Socks5Auth] = None
-    socks_url: Optional[str] = None
-
-    def get_proxy(self) -> Dict[str, Union[str, Socks5Auth]]:
-        if not isinstance(self.proxy_auth, Socks5Auth):
-            self.proxy_auth = Socks5Auth(
-                login=self.login,
-                password=self.password
-            )
-
-        self.socks_url = '{socks_type}://{ip_address}'.format(
-            socks_type=self.service_type.lower(),
-            ip_address=self.ip_address
-        )
-        return dict(
-            proxy_auth=self.proxy_auth,
-            proxy=self.socks_url
-        )
-
-
-class RequestAuthError(Exception):
-    """
-    Ошибка при неправильной аунтефикации POST or GET data
-
-    """
-
-
-class HttpBase(object):
+class Core:
     """
     Class, which include abstract methods of parser
 
     """
+
+    def __getattr__(self, item: Any) -> Any:
+        """
+        Method, which can get an attribute of base_headers by this method
+
+        :param item: key name of _base_headers dict data
+        :return:
+        """
+        try:
+            return self._base_headers.get(item)
+        except KeyError:
+            """Returning None"""
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Method to compare instances of parsers
+
+        :param other: other object
+        :return: bool
+        """
+        if isinstance(other, HttpXParser):
+            if other.url == self.url and other._base_headers == self._base_headers:
+                return True
+        return False
+
+    def __setitem__(self, key, value) -> None:
+        """
+
+        :param key: key of base_headers dict
+        :param value: value of base_headers dict
+        :return: None
+        """
+        self._base_headers.update(
+            {key: value}
+        )
 
 
 class RequestProxyError(Exception):
     """Возникает, если были переданы неправильные параметры запроса"""
 
 
-class HttpXParser(HttpBase):
+class HttpXParser():
     """
     Парсер для django сайта, собирает дополнительную информацию
 
@@ -78,9 +67,9 @@ class HttpXParser(HttpBase):
     def __init__(self):
         self._base_headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
-            'Accept-Language': "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
-            # 'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7"
         }
+        self._core = Core()
         self._session: Optional[ClientSession] = None
         self.url = 'http://127.0.0.1/api/'
         self._timeout = ClientTimeout(total=2 * 15, connect=None, sock_connect=5, sock_read=None)
@@ -119,7 +108,7 @@ class HttpXParser(HttpBase):
         headers = headers.update(self._base_headers) if isinstance(headers, dict) else self._base_headers
 
         if isinstance(proxy, CredentialService):
-            self._connector = ProxyConnector(verify_ssl=False)
+            self._connector = ProxyConnector()
             self.request_class = ProxyClientRequest
 
         try:
@@ -144,11 +133,11 @@ class HttpXParser(HttpBase):
                         headers=headers,
                         **proxy_kwargs
                     )
-                except (ClientProxyConnectionError, SocksError):
+                except (ClientProxyConnectionError, SocksError, ServerDisconnectedError) as ex:
                     if not skip_exceptions:
-                        raise ConnectionError()
+                        raise ConnectionError() from ex
                     return Response.bad_response()
-                    # Get content from site
+                # Get content from site
                 try:
                     data = await response.json(
                         content_type="application/json"
@@ -159,7 +148,12 @@ class HttpXParser(HttpBase):
                     data = await response.read()
                 return Response(
                     status_code=response.status,
-                    response_data=data
+                    response_data=data,
+                    raw_headers=response.raw_headers,
+                    cookies=response.cookies,
+                    ok=response.ok,
+                    content_type=response.content_type,
+                    host=response.host
                 )
 
     @staticmethod
@@ -232,10 +226,7 @@ class HttpXParser(HttpBase):
         :param item: key name of _base_headers dict data
         :return:
         """
-        try:
-            return self._base_headers.get(item)
-        except KeyError:
-            """Returning None"""
+        return self._core.__getattr__(item)
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -244,10 +235,7 @@ class HttpXParser(HttpBase):
         :param other: other object
         :return: bool
         """
-        if isinstance(other, self.__class__):
-            if other.url == self.url and other._base_headers == self._base_headers:
-                return True
-        return False
+        return self._core.__eq__(other)
 
     def __setitem__(self, key, value) -> None:
         """
@@ -256,9 +244,7 @@ class HttpXParser(HttpBase):
         :param value: value of base_headers dict
         :return: None
         """
-        self._base_headers.update(
-            {key: value}
-        )
+        self._core.__setitem__(key, value)
 
     @staticmethod
     def combine_proxies(
@@ -282,9 +268,9 @@ class HttpXParser(HttpBase):
 async def send_query():
     parser = HttpXParser()
     async for response in parser.fast().fetch(
-        url='https://school12.osvita-konotop.gov.ua/',
-        times=1000,
-        method='GET'
+            url='https://school12.osvita-konotop.gov.ua/',
+            times=1000,
+            method='GET'
     ):
         print(response.status_code)
 
