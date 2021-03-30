@@ -1,9 +1,9 @@
 from typing import Union, Optional
+
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms import ModelForm
-from django.http import HttpRequest, QueryDict, HttpResponse
-from django.template.response import TemplateResponse
+from django.http import HttpRequest
 from django.utils.safestring import mark_safe, SafeString
 
 from .forms import ProductForm, CategoryForm, UserOrderForm, ReviewDetailForm, BasketDetailForm

@@ -16,6 +16,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/media/product/product_photos/2021/03" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources/f66811af-f1db-4899-b7e8-18a40164530a/storage_v2/_src_/database/educational.0ylw8Q" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (django_project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
