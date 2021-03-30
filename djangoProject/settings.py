@@ -213,6 +213,7 @@ CKEDITOR_CONFIGS = {
         ]),
     }
 }
+ATOMIC_REQUESTS = True
 
 MEDIA_URL = '/media/'
 # Use this variable in list of middleware

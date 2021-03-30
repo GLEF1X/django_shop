@@ -1,8 +1,8 @@
 from datetime import date
 from typing import Dict, Any, List, Union
-
 from django import http
 from django.core.mail import send_mail
+from django.db import transaction, IntegrityError
 from django.db.models import Prefetch, Sum, F, DecimalField, QuerySet
 from django.forms import model_to_dict
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, FileResponse, HttpResponseRedirect, \
@@ -195,8 +195,21 @@ def today_view(request: HttpRequest) -> HttpResponseNotFound:
     return rendered
 
 
+@transaction.atomic
 def month_view(request: HttpRequest, pk: int):
-    return HttpResponse('HELLO WORLD')
+    product2 = Product.objects.select_related(
+        'category'
+    ).all()
+    print(product2)
+    try:
+        with transaction.atomic():
+            product = Product.objects.filter(
+                pk=pk
+            ).only("product_name").first()
+            print(product)
+    except IntegrityError:
+        print('rollback to {sid}'.format(sid='first'))
+    return HttpResponseRedirect(reverse('store:index'))
 
 
 def not_found_view(request: HttpRequest):
@@ -364,8 +377,3 @@ class ApiView(generic.View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(ApiView, self).dispatch(request, *args, **kwargs)
-
-
-class BaseView2(generic.View):
-    def get(self, *args, **kwargs) -> HttpResponseRedirect:
-        pass
